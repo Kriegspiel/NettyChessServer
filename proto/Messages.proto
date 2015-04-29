@@ -1,0 +1,50 @@
+message MClientMessage {
+    enum EType {
+        START_GAME = 0;
+        MOVE = 1;
+    }
+
+    message MStartGame {
+        required int64 gameId = 1;
+    }
+
+    message MMove {
+        required int32 sqFrom = 1;
+        required int32 sqTo = 2;
+        optional int32 promoPiece = 3;
+    }
+
+    required EType type = 1;
+    optional MStartGame startGame = 2;
+    optional MMove move = 3;
+}
+
+message MServerMessage {
+    enum EType {
+        GAME_STARTED = 0;
+        MOVE_RESP = 1;
+        STATE_UPDATE = 2;
+    }
+
+    message MGameStarted {
+        required int64 gameId = 1;
+    }
+
+    message MMoveResp {
+        enum EResponse {
+            SUCCESS = 0;
+            FAILURE = 1;
+        }
+
+        required EResponse response = 1;
+    }
+
+    message MStateUpdate {
+        required string newState = 1;
+    }
+
+    required EType type = 1;
+    optional MGameStarted gameStarted = 2;
+    optional MMoveResp moveResp = 3;
+    optional MStateUpdate stateUpdate = 4;
+}

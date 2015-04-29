@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="Chesspresso-lib">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/lib/Chesspresso-lib.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
