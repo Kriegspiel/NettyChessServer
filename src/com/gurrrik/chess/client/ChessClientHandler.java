@@ -18,7 +18,7 @@ public class ChessClientHandler extends SimpleChannelInboundHandler<Messages.MSe
 
     protected void handleStateUpdateMessage(ChannelHandlerContext ctx,
                                             Messages.MServerMessage.MStateUpdate msg) {
-
+        System.err.println(msg.getNewState());
     }
 
     @Override

@@ -7,15 +7,15 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 
 import java.net.SocketAddress;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 @ChannelHandler.Sharable
 public class ChessServerHandler extends SimpleChannelInboundHandler<Messages.MClientMessage> {
-    private Map<Long, ChessGameRoom> games = new HashMap<>();
-    private Map<SocketAddress, Long> playersInGame = new HashMap<>();
+    private Map<Long, ChessGameRoom> games = new ConcurrentHashMap<>();
+    private Map<SocketAddress, Long> playersInGame = new ConcurrentHashMap<>();
 
-    protected synchronized void handleStartGameMessage(ChannelHandlerContext ctx,
+    protected void handleStartGameMessage(ChannelHandlerContext ctx,
                                           Messages.MClientMessage.MStartGame msg) throws Exception {
         SocketAddress playerAddress = ctx.channel().remoteAddress();
         if (playersInGame.containsKey(playerAddress)) {
@@ -44,7 +44,7 @@ public class ChessServerHandler extends SimpleChannelInboundHandler<Messages.MCl
         playersInGame.put(playerAddress, gameId);
     }
 
-    protected synchronized void handleMoveMessage(ChannelHandlerContext ctx,
+    protected void handleMoveMessage(ChannelHandlerContext ctx,
                                                   Messages.MClientMessage.MMove msg) throws Exception {
 
     }
@@ -68,6 +68,24 @@ public class ChessServerHandler extends SimpleChannelInboundHandler<Messages.MCl
                 }
                 handleMoveMessage(ctx, msg.getMove());
                 break;
+        }
+    }
+
+    @Override
+    public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+        SocketAddress playerAddress = ctx.channel().remoteAddress();
+
+        if (playersInGame.containsKey(playerAddress)) {
+            long gameId = playersInGame.get(playerAddress);
+            ChessGameRoom gameRoom = games.get(gameId);
+
+            SocketAddress player1 = gameRoom.getPlayerWhite();
+            SocketAddress player2 = gameRoom.getPlayerBlack();
+            gameRoom.playerDisconnected(playerAddress);
+
+            games.remove(gameId);
+            playersInGame.remove(player1);
+            playersInGame.remove(player2);
         }
     }
 }

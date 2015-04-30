@@ -1,3 +1,5 @@
+package com.gurrrik.chess.protos;
+
 message MClientMessage {
     enum EType {
         START_GAME = 0;
@@ -24,6 +26,7 @@ message MServerMessage {
         GAME_STARTED = 0;
         MOVE_RESP = 1;
         STATE_UPDATE = 2;
+        GAME_OVER = 3;
     }
 
     message MGameStarted {
@@ -43,8 +46,19 @@ message MServerMessage {
         required string newState = 1;
     }
 
+    message MGameOver {
+        enum EResult {
+            WHITE = 0;
+            BLACK = 1;
+            DRAW = 2;
+        }
+
+        required EResult result = 1;
+    }
+
     required EType type = 1;
     optional MGameStarted gameStarted = 2;
     optional MMoveResp moveResp = 3;
     optional MStateUpdate stateUpdate = 4;
+    optional MGameOver gameOver = 5;
 }
