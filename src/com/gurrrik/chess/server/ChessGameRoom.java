@@ -2,6 +2,8 @@ package com.gurrrik.chess.server;
 
 import chesspresso.Chess;
 import chesspresso.game.Game;
+import chesspresso.move.IllegalMoveException;
+import chesspresso.position.Position;
 import com.gurrrik.chess.protos.Messages;
 import io.netty.channel.Channel;
 
@@ -61,6 +63,32 @@ public class ChessGameRoom {
         playerBlackChannel.writeAndFlush(msg);
     }
 
+    private void sendMoveResponse(int player, boolean response) {
+        Messages.MServerMessage.MMoveResp.Builder msgMoveRespBuilder
+                = Messages.MServerMessage.MMoveResp.newBuilder();
+        msgMoveRespBuilder.setResponse(response
+                ? Messages.MServerMessage.MMoveResp.EResponse.SUCCESS
+                : Messages.MServerMessage.MMoveResp.EResponse.FAILURE);
+
+        Messages.MServerMessage.Builder msgBuilder
+                = Messages.MServerMessage.newBuilder();
+        msgBuilder.setType(Messages.MServerMessage.EType.MOVE_RESP);
+        msgBuilder.setMoveResp(msgMoveRespBuilder.build());
+
+        Messages.MServerMessage msg = msgBuilder.build();
+
+        switch (player) {
+            case Chess.WHITE:
+                playerWhiteChannel.writeAndFlush(msg);
+                break;
+            case Chess.BLACK:
+                playerBlackChannel.writeAndFlush(msg);
+                break;
+            default:
+                break;
+        }
+    }
+
     private void sendGameOver(int result) {
         Messages.MServerMessage.MGameOver.Builder msgGameOverBuilder
                 = Messages.MServerMessage.MGameOver.newBuilder();
@@ -105,6 +133,40 @@ public class ChessGameRoom {
 
     public synchronized boolean hasRoom() {
         return playerBlack == null;
+    }
+
+    public synchronized void makeMove(SocketAddress playerAddress, int sqrFrom, int sqrTo, int promoPiece) {
+        if (promoPiece < 0)
+            promoPiece = 0;
+
+        Position pos = chessGame.getPosition();
+        if (playerAddress.equals(playerWhite)) {
+            if (pos.getToPlay() == Chess.WHITE) {
+                try {
+                    pos.doMove(pos.getMove(sqrFrom, sqrTo, promoPiece));
+                    sendMoveResponse(Chess.WHITE, true);
+                    sendGameState();
+                } catch (IllegalMoveException e) {
+                    sendMoveResponse(Chess.WHITE, false);
+                }
+            } else {
+                sendMoveResponse(Chess.WHITE, false);
+            }
+        } else if (playerAddress.equals(playerBlack)) {
+            if (pos.getToPlay() == Chess.BLACK) {
+                try {
+                    pos.doMove(pos.getMove(sqrFrom, sqrTo, promoPiece));
+                    sendMoveResponse(Chess.BLACK, true);
+                    sendGameState();
+                } catch (IllegalMoveException e) {
+                    sendMoveResponse(Chess.BLACK, false);
+                }
+            } else {
+                sendMoveResponse(Chess.BLACK, false);
+            }
+        } else {
+            throw new RuntimeException("No such player in game: " + playerAddress.toString());
+        }
     }
 
     public synchronized void playerDisconnected(SocketAddress playerAddress) {

@@ -45,8 +45,22 @@ public class ChessServerHandler extends SimpleChannelInboundHandler<Messages.MCl
     }
 
     protected void handleMoveMessage(ChannelHandlerContext ctx,
-                                                  Messages.MClientMessage.MMove msg) throws Exception {
+                                     Messages.MClientMessage.MMove msg) throws Exception {
+        SocketAddress playerAddress = ctx.channel().remoteAddress();
+        if (!playersInGame.containsKey(playerAddress)) {
+            System.err.println("Player is not in game: " + playerAddress.toString());
+            return;
+        }
 
+        System.err.println("Attempted move by player " + playerAddress.toString());
+
+        long gameId = playersInGame.get(playerAddress);
+        ChessGameRoom gameRoom = games.get(gameId);
+        if (gameRoom.hasRoom()) {
+            System.err.println("Game has not yet started");
+            return;
+        }
+        gameRoom.makeMove(playerAddress, msg.getSqFrom(), msg.getSqTo(), msg.getPromoPiece());
     }
 
     @Override
@@ -84,8 +98,10 @@ public class ChessServerHandler extends SimpleChannelInboundHandler<Messages.MCl
             gameRoom.playerDisconnected(playerAddress);
 
             games.remove(gameId);
-            playersInGame.remove(player1);
-            playersInGame.remove(player2);
+            if (player1 != null)
+                playersInGame.remove(player1);
+            if (player2 != null)
+                playersInGame.remove(player2);
         }
     }
 }
