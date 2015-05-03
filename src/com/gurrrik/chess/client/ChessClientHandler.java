@@ -9,16 +9,22 @@ public class ChessClientHandler extends SimpleChannelInboundHandler<Messages.MSe
     protected void handleGameStartedMessage(ChannelHandlerContext ctx,
                                             Messages.MServerMessage.MGameStarted msg) {
         System.err.println(msg.getGameId());
+        System.err.println(msg.getSide().toString());
     }
 
     protected void handleMoveResponseMessage(ChannelHandlerContext ctx,
                                             Messages.MServerMessage.MMoveResp msg) {
-
+        System.err.println(msg.getResponse().toString());
     }
 
     protected void handleStateUpdateMessage(ChannelHandlerContext ctx,
                                             Messages.MServerMessage.MStateUpdate msg) {
         System.err.println(msg.getNewState());
+    }
+
+    protected void handleGameOverMessage(ChannelHandlerContext ctx,
+                                         Messages.MServerMessage.MGameOver msg) {
+        System.err.println(msg.getResult().toString());
     }
 
     @Override
@@ -46,6 +52,15 @@ public class ChessClientHandler extends SimpleChannelInboundHandler<Messages.MSe
                     return;
                 }
                 handleStateUpdateMessage(ctx, msg.getStateUpdate());
+                break;
+            case GAME_OVER:
+                if (!msg.hasGameOver()) {
+                    System.err.println("Malformed message: " + msg.toString());
+                    return;
+                }
+                handleGameOverMessage(ctx, msg.getGameOver());
+                break;
+            default:
                 break;
         }
     }

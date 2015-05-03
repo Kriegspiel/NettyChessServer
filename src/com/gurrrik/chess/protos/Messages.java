@@ -2211,6 +2211,15 @@ public final class Messages {
        * <code>required int64 gameId = 1;</code>
        */
       long getGameId();
+
+      /**
+       * <code>required .com.gurrrik.chess.protos.MServerMessage.MGameStarted.ESide side = 2;</code>
+       */
+      boolean hasSide();
+      /**
+       * <code>required .com.gurrrik.chess.protos.MServerMessage.MGameStarted.ESide side = 2;</code>
+       */
+      com.gurrrik.chess.protos.Messages.MServerMessage.MGameStarted.ESide getSide();
     }
     /**
      * Protobuf type {@code com.gurrrik.chess.protos.MServerMessage.MGameStarted}
@@ -2269,6 +2278,17 @@ public final class Messages {
                 gameId_ = input.readInt64();
                 break;
               }
+              case 16: {
+                int rawValue = input.readEnum();
+                com.gurrrik.chess.protos.Messages.MServerMessage.MGameStarted.ESide value = com.gurrrik.chess.protos.Messages.MServerMessage.MGameStarted.ESide.valueOf(rawValue);
+                if (value == null) {
+                  unknownFields.mergeVarintField(2, rawValue);
+                } else {
+                  bitField0_ |= 0x00000002;
+                  side_ = value;
+                }
+                break;
+              }
             }
           }
         } catch (com.google.protobuf.InvalidProtocolBufferException e) {
@@ -2308,6 +2328,88 @@ public final class Messages {
         return PARSER;
       }
 
+      /**
+       * Protobuf enum {@code com.gurrrik.chess.protos.MServerMessage.MGameStarted.ESide}
+       */
+      public enum ESide
+          implements com.google.protobuf.ProtocolMessageEnum {
+        /**
+         * <code>WHITE = 0;</code>
+         */
+        WHITE(0, 0),
+        /**
+         * <code>BLACK = 1;</code>
+         */
+        BLACK(1, 1),
+        ;
+
+        /**
+         * <code>WHITE = 0;</code>
+         */
+        public static final int WHITE_VALUE = 0;
+        /**
+         * <code>BLACK = 1;</code>
+         */
+        public static final int BLACK_VALUE = 1;
+
+
+        public final int getNumber() { return value; }
+
+        public static ESide valueOf(int value) {
+          switch (value) {
+            case 0: return WHITE;
+            case 1: return BLACK;
+            default: return null;
+          }
+        }
+
+        public static com.google.protobuf.Internal.EnumLiteMap<ESide>
+            internalGetValueMap() {
+          return internalValueMap;
+        }
+        private static com.google.protobuf.Internal.EnumLiteMap<ESide>
+            internalValueMap =
+              new com.google.protobuf.Internal.EnumLiteMap<ESide>() {
+                public ESide findValueByNumber(int number) {
+                  return ESide.valueOf(number);
+                }
+              };
+
+        public final com.google.protobuf.Descriptors.EnumValueDescriptor
+            getValueDescriptor() {
+          return getDescriptor().getValues().get(index);
+        }
+        public final com.google.protobuf.Descriptors.EnumDescriptor
+            getDescriptorForType() {
+          return getDescriptor();
+        }
+        public static final com.google.protobuf.Descriptors.EnumDescriptor
+            getDescriptor() {
+          return com.gurrrik.chess.protos.Messages.MServerMessage.MGameStarted.getDescriptor().getEnumTypes().get(0);
+        }
+
+        private static final ESide[] VALUES = values();
+
+        public static ESide valueOf(
+            com.google.protobuf.Descriptors.EnumValueDescriptor desc) {
+          if (desc.getType() != getDescriptor()) {
+            throw new java.lang.IllegalArgumentException(
+              "EnumValueDescriptor is not for this type.");
+          }
+          return VALUES[desc.getIndex()];
+        }
+
+        private final int index;
+        private final int value;
+
+        private ESide(int index, int value) {
+          this.index = index;
+          this.value = value;
+        }
+
+        // @@protoc_insertion_point(enum_scope:com.gurrrik.chess.protos.MServerMessage.MGameStarted.ESide)
+      }
+
       private int bitField0_;
       public static final int GAMEID_FIELD_NUMBER = 1;
       private long gameId_;
@@ -2324,8 +2426,24 @@ public final class Messages {
         return gameId_;
       }
 
+      public static final int SIDE_FIELD_NUMBER = 2;
+      private com.gurrrik.chess.protos.Messages.MServerMessage.MGameStarted.ESide side_;
+      /**
+       * <code>required .com.gurrrik.chess.protos.MServerMessage.MGameStarted.ESide side = 2;</code>
+       */
+      public boolean hasSide() {
+        return ((bitField0_ & 0x00000002) == 0x00000002);
+      }
+      /**
+       * <code>required .com.gurrrik.chess.protos.MServerMessage.MGameStarted.ESide side = 2;</code>
+       */
+      public com.gurrrik.chess.protos.Messages.MServerMessage.MGameStarted.ESide getSide() {
+        return side_;
+      }
+
       private void initFields() {
         gameId_ = 0L;
+        side_ = com.gurrrik.chess.protos.Messages.MServerMessage.MGameStarted.ESide.WHITE;
       }
       private byte memoizedIsInitialized = -1;
       public final boolean isInitialized() {
@@ -2334,6 +2452,10 @@ public final class Messages {
         if (isInitialized == 0) return false;
 
         if (!hasGameId()) {
+          memoizedIsInitialized = 0;
+          return false;
+        }
+        if (!hasSide()) {
           memoizedIsInitialized = 0;
           return false;
         }
@@ -2347,6 +2469,9 @@ public final class Messages {
         if (((bitField0_ & 0x00000001) == 0x00000001)) {
           output.writeInt64(1, gameId_);
         }
+        if (((bitField0_ & 0x00000002) == 0x00000002)) {
+          output.writeEnum(2, side_.getNumber());
+        }
         getUnknownFields().writeTo(output);
       }
 
@@ -2359,6 +2484,10 @@ public final class Messages {
         if (((bitField0_ & 0x00000001) == 0x00000001)) {
           size += com.google.protobuf.CodedOutputStream
             .computeInt64Size(1, gameId_);
+        }
+        if (((bitField0_ & 0x00000002) == 0x00000002)) {
+          size += com.google.protobuf.CodedOutputStream
+            .computeEnumSize(2, side_.getNumber());
         }
         size += getUnknownFields().getSerializedSize();
         memoizedSerializedSize = size;
@@ -2479,6 +2608,8 @@ public final class Messages {
           super.clear();
           gameId_ = 0L;
           bitField0_ = (bitField0_ & ~0x00000001);
+          side_ = com.gurrrik.chess.protos.Messages.MServerMessage.MGameStarted.ESide.WHITE;
+          bitField0_ = (bitField0_ & ~0x00000002);
           return this;
         }
 
@@ -2511,6 +2642,10 @@ public final class Messages {
             to_bitField0_ |= 0x00000001;
           }
           result.gameId_ = gameId_;
+          if (((from_bitField0_ & 0x00000002) == 0x00000002)) {
+            to_bitField0_ |= 0x00000002;
+          }
+          result.side_ = side_;
           result.bitField0_ = to_bitField0_;
           onBuilt();
           return result;
@@ -2530,12 +2665,19 @@ public final class Messages {
           if (other.hasGameId()) {
             setGameId(other.getGameId());
           }
+          if (other.hasSide()) {
+            setSide(other.getSide());
+          }
           this.mergeUnknownFields(other.getUnknownFields());
           return this;
         }
 
         public final boolean isInitialized() {
           if (!hasGameId()) {
+            
+            return false;
+          }
+          if (!hasSide()) {
             
             return false;
           }
@@ -2589,6 +2731,41 @@ public final class Messages {
         public Builder clearGameId() {
           bitField0_ = (bitField0_ & ~0x00000001);
           gameId_ = 0L;
+          onChanged();
+          return this;
+        }
+
+        private com.gurrrik.chess.protos.Messages.MServerMessage.MGameStarted.ESide side_ = com.gurrrik.chess.protos.Messages.MServerMessage.MGameStarted.ESide.WHITE;
+        /**
+         * <code>required .com.gurrrik.chess.protos.MServerMessage.MGameStarted.ESide side = 2;</code>
+         */
+        public boolean hasSide() {
+          return ((bitField0_ & 0x00000002) == 0x00000002);
+        }
+        /**
+         * <code>required .com.gurrrik.chess.protos.MServerMessage.MGameStarted.ESide side = 2;</code>
+         */
+        public com.gurrrik.chess.protos.Messages.MServerMessage.MGameStarted.ESide getSide() {
+          return side_;
+        }
+        /**
+         * <code>required .com.gurrrik.chess.protos.MServerMessage.MGameStarted.ESide side = 2;</code>
+         */
+        public Builder setSide(com.gurrrik.chess.protos.Messages.MServerMessage.MGameStarted.ESide value) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          bitField0_ |= 0x00000002;
+          side_ = value;
+          onChanged();
+          return this;
+        }
+        /**
+         * <code>required .com.gurrrik.chess.protos.MServerMessage.MGameStarted.ESide side = 2;</code>
+         */
+        public Builder clearSide() {
+          bitField0_ = (bitField0_ & ~0x00000002);
+          side_ = com.gurrrik.chess.protos.Messages.MServerMessage.MGameStarted.ESide.WHITE;
           onChanged();
           return this;
         }
@@ -5146,7 +5323,7 @@ public final class Messages {
       "ientMessage.MMove\032\034\n\nMStartGame\022\016\n\006gameI" +
       "d\030\001 \002(\003\0329\n\005MMove\022\016\n\006sqFrom\030\001 \002(\005\022\014\n\004sqTo" +
       "\030\002 \002(\005\022\022\n\npromoPiece\030\003 \001(\005\"!\n\005EType\022\016\n\nS" +
-      "TART_GAME\020\000\022\010\n\004MOVE\020\001\"\211\006\n\016MServerMessage",
+      "TART_GAME\020\000\022\010\n\004MOVE\020\001\"\364\006\n\016MServerMessage",
       "\022<\n\004type\030\001 \002(\0162..com.gurrrik.chess.proto" +
       "s.MServerMessage.EType\022J\n\013gameStarted\030\002 " +
       "\001(\01325.com.gurrrik.chess.protos.MServerMe" +
@@ -5155,18 +5332,20 @@ public final class Messages {
       "MoveResp\022J\n\013stateUpdate\030\004 \001(\01325.com.gurr" +
       "rik.chess.protos.MServerMessage.MStateUp" +
       "date\022D\n\010gameOver\030\005 \001(\01322.com.gurrrik.che" +
-      "ss.protos.MServerMessage.MGameOver\032\036\n\014MG" +
-      "ameStarted\022\016\n\006gameId\030\001 \002(\003\032\202\001\n\tMMoveResp",
-      "\022N\n\010response\030\001 \002(\0162<.com.gurrrik.chess.p" +
-      "rotos.MServerMessage.MMoveResp.EResponse" +
-      "\"%\n\tEResponse\022\013\n\007SUCCESS\020\000\022\013\n\007FAILURE\020\001\032" +
-      " \n\014MStateUpdate\022\020\n\010newState\030\001 \002(\t\032\202\001\n\tMG" +
-      "ameOver\022J\n\006result\030\001 \002(\0162:.com.gurrrik.ch" +
-      "ess.protos.MServerMessage.MGameOver.ERes" +
-      "ult\")\n\007EResult\022\t\n\005WHITE\020\000\022\t\n\005BLACK\020\001\022\010\n\004" +
-      "DRAW\020\002\"I\n\005EType\022\020\n\014GAME_STARTED\020\000\022\r\n\tMOV" +
-      "E_RESP\020\001\022\020\n\014STATE_UPDATE\020\002\022\r\n\tGAME_OVER\020" +
-      "\003"
+      "ss.protos.MServerMessage.MGameOver\032\210\001\n\014M" +
+      "GameStarted\022\016\n\006gameId\030\001 \002(\003\022I\n\004side\030\002 \002(",
+      "\0162;.com.gurrrik.chess.protos.MServerMess" +
+      "age.MGameStarted.ESide\"\035\n\005ESide\022\t\n\005WHITE" +
+      "\020\000\022\t\n\005BLACK\020\001\032\202\001\n\tMMoveResp\022N\n\010response\030" +
+      "\001 \002(\0162<.com.gurrrik.chess.protos.MServer" +
+      "Message.MMoveResp.EResponse\"%\n\tEResponse" +
+      "\022\013\n\007SUCCESS\020\000\022\013\n\007FAILURE\020\001\032 \n\014MStateUpda" +
+      "te\022\020\n\010newState\030\001 \002(\t\032\202\001\n\tMGameOver\022J\n\006re" +
+      "sult\030\001 \002(\0162:.com.gurrrik.chess.protos.MS" +
+      "erverMessage.MGameOver.EResult\")\n\007EResul" +
+      "t\022\t\n\005WHITE\020\000\022\t\n\005BLACK\020\001\022\010\n\004DRAW\020\002\"I\n\005ETy",
+      "pe\022\020\n\014GAME_STARTED\020\000\022\r\n\tMOVE_RESP\020\001\022\020\n\014S" +
+      "TATE_UPDATE\020\002\022\r\n\tGAME_OVER\020\003"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -5209,7 +5388,7 @@ public final class Messages {
     internal_static_com_gurrrik_chess_protos_MServerMessage_MGameStarted_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_com_gurrrik_chess_protos_MServerMessage_MGameStarted_descriptor,
-        new java.lang.String[] { "GameId", });
+        new java.lang.String[] { "GameId", "Side", });
     internal_static_com_gurrrik_chess_protos_MServerMessage_MMoveResp_descriptor =
       internal_static_com_gurrrik_chess_protos_MServerMessage_descriptor.getNestedTypes().get(1);
     internal_static_com_gurrrik_chess_protos_MServerMessage_MMoveResp_fieldAccessorTable = new

@@ -30,7 +30,13 @@ message MServerMessage {
     }
 
     message MGameStarted {
+        enum ESide {
+            WHITE = 0;
+            BLACK = 1;
+        }
+
         required int64 gameId = 1;
+        required ESide side = 2;
     }
 
     message MMoveResp {

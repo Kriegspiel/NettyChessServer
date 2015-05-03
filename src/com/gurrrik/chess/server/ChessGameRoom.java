@@ -35,16 +35,22 @@ public class ChessGameRoom {
         Messages.MServerMessage.MGameStarted.Builder msgGameStartedBuilder
                 = Messages.MServerMessage.MGameStarted.newBuilder();
         msgGameStartedBuilder.setGameId(gameId);
+        msgGameStartedBuilder.setSide(Messages.MServerMessage.MGameStarted.ESide.WHITE);
 
         Messages.MServerMessage.Builder msgBuilder
                 = Messages.MServerMessage.newBuilder();
         msgBuilder.setType(Messages.MServerMessage.EType.GAME_STARTED);
         msgBuilder.setGameStarted(msgGameStartedBuilder.build());
 
-        Messages.MServerMessage msg = msgBuilder.build();
+        Messages.MServerMessage msgWhite = msgBuilder.build();
 
-        playerWhiteChannel.writeAndFlush(msg);
-        playerBlackChannel.writeAndFlush(msg);
+        msgGameStartedBuilder.setSide(Messages.MServerMessage.MGameStarted.ESide.BLACK);
+        msgBuilder.setGameStarted(msgGameStartedBuilder.build());
+
+        Messages.MServerMessage msgBlack = msgBuilder.build();
+
+        playerWhiteChannel.writeAndFlush(msgWhite);
+        playerBlackChannel.writeAndFlush(msgBlack);
     }
 
     private void sendGameState() {
