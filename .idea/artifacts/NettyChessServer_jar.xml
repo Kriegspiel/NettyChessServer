@@ -1,15 +1,17 @@
 <component name="ArtifactManager">
-  <artifact type="jar" name="NettyChessServer:jar">
+  <artifact name="NettyChessServer:jar">
     <output-path>$PROJECT_DIR$/out/artifacts/NettyChessServer_jar</output-path>
-    <root id="archive" name="NettyChessServer.jar">
-      <element id="directory" name="META-INF">
-        <element id="file-copy" path="$PROJECT_DIR$/src/com/gurrrik/chess/server/META-INF/MANIFEST.MF" />
+    <root id="root">
+      <element id="archive" name="NettyChessServer.jar">
+        <element id="directory" name="META-INF">
+          <element id="file-copy" path="$PROJECT_DIR$/src/com/gurrrik/chess/server/META-INF/MANIFEST.MF" />
+        </element>
+        <element id="module-output" name="NettyChessServer" />
       </element>
-      <element id="module-output" name="NettyChessServer" />
-      <element id="extracted-dir" path="$PROJECT_DIR$/lib/jcommander-1.48.jar" path-in-jar="/" />
-      <element id="extracted-dir" path="$PROJECT_DIR$/lib/netty-all-4.0.27.Final.jar" path-in-jar="/" />
-      <element id="extracted-dir" path="$PROJECT_DIR$/lib/protobuf-java-2.5.0.jar" path-in-jar="/" />
-      <element id="extracted-dir" path="$PROJECT_DIR$/lib/Chesspresso-lib.jar" path-in-jar="/" />
+      <element id="library" level="project" name="com.beust:jcommander:1.48" />
+      <element id="library" level="project" name="io.netty:netty-all:4.0.27.Final" />
+      <element id="library" level="project" name="com.google.protobuf:protobuf-java:2.5.0" />
+      <element id="library" level="project" name="Chesspresso-lib" />
     </root>
   </artifact>
 </component>

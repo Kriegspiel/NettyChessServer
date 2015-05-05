@@ -1,3 +1,5 @@
 Manifest-Version: 1.0
+Class-Path: jcommander-1.48.jar netty-all-4.0.27.Final.jar protobuf-ja
+ va-2.5.0.jar Chesspresso-lib.jar
 Main-Class: com.gurrrik.chess.server.ChessServer
 
