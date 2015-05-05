@@ -12,6 +12,7 @@ import java.net.SocketAddress;
 public class ChessGameRoom {
     private long gameId;
     private Game chessGame;
+    private boolean finished;
 
     public SocketAddress getPlayerWhite() {
         return playerWhite;
@@ -29,6 +30,7 @@ public class ChessGameRoom {
     public ChessGameRoom(long id) {
         gameId = id;
         chessGame = new Game();
+        finished = false;
     }
 
     private void sendGameStarted() {
@@ -108,6 +110,8 @@ public class ChessGameRoom {
             case Chess.RES_DRAW:
                 msgGameOverBuilder.setResult(Messages.MServerMessage.MGameOver.EResult.DRAW);
                 break;
+            default:
+                return;
         }
 
         Messages.MServerMessage.Builder msgBuilder
@@ -142,6 +146,9 @@ public class ChessGameRoom {
     }
 
     public synchronized void makeMove(SocketAddress playerAddress, int sqrFrom, int sqrTo, int promoPiece) {
+        if (finished)
+            return;
+
         if (promoPiece < 0)
             promoPiece = 0;
 
@@ -173,9 +180,25 @@ public class ChessGameRoom {
         } else {
             throw new RuntimeException("No such player in game: " + playerAddress.toString());
         }
+
+        if (pos.isStaleMate()) {
+            finished = true;
+            sendGameOver(Chess.RES_DRAW);
+        } else if (pos.isMate()) {
+            finished = true;
+            switch (pos.getToPlay()) {
+                case Chess.WHITE:
+                    sendGameOver(Chess.RES_BLACK_WINS);
+                    break;
+                case Chess.BLACK:
+                    sendGameOver(Chess.RES_WHITE_WINS);
+                    break;
+            }
+        }
     }
 
     public synchronized void playerDisconnected(SocketAddress playerAddress) {
+        finished = true;
         if (playerAddress.equals(playerWhite)) {
             playerWhite = null;
             playerWhiteChannel = null;
