@@ -13,13 +13,36 @@ public class ChessClientHandler extends SimpleChannelInboundHandler<Messages.MSe
     }
 
     protected void handleMoveResponseMessage(ChannelHandlerContext ctx,
-                                            Messages.MServerMessage.MMoveResp msg) {
+                                             Messages.MServerMessage.MMoveResp msg) {
         System.err.println(msg.getResponse().toString());
+    }
+
+    private static String expandFENLine(String line) {
+        StringBuilder sb = new StringBuilder();
+        for (char c: line.toCharArray()) {
+            if (Character.isDigit(c)) {
+                for (int i = c - '0'; i > 0; --i)
+                    sb.append('.');
+            } else {
+                sb.append(c);
+            }
+        }
+        return sb.toString();
     }
 
     protected void handleStateUpdateMessage(ChannelHandlerContext ctx,
                                             Messages.MServerMessage.MStateUpdate msg) {
         System.err.println(msg.getNewState());
+        String gameState = msg.getNewState();
+        String boardState = gameState.split("\\s+")[0];
+        String[] lines = boardState.split("/");
+
+        StringBuilder sb = new StringBuilder();
+        for (String line: lines) {
+            sb.append(expandFENLine(line));
+            sb.append("\n");
+        }
+        System.out.println(sb.toString());
     }
 
     protected void handleGameOverMessage(ChannelHandlerContext ctx,
