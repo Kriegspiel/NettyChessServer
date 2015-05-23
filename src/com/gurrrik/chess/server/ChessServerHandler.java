@@ -1,6 +1,6 @@
 package com.gurrrik.chess.server;
 
-import com.gurrrik.chess.protos.Messages;
+import com.gurrrik.chess.protos.Messages.MClientMessage;
 
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
@@ -11,12 +11,12 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 @ChannelHandler.Sharable
-public class ChessServerHandler extends SimpleChannelInboundHandler<Messages.MClientMessage> {
+public class ChessServerHandler extends SimpleChannelInboundHandler<MClientMessage> {
     private Map<Long, ChessGameRoom> games = new ConcurrentHashMap<>();
     private Map<SocketAddress, Long> playersInGame = new ConcurrentHashMap<>();
 
-    protected void handleStartGameMessage(ChannelHandlerContext ctx,
-                                          Messages.MClientMessage.MStartGame msg) throws Exception {
+    protected void handleMessage(ChannelHandlerContext ctx,
+                                 MClientMessage.MStartGame msg) throws Exception {
         SocketAddress playerAddress = ctx.channel().remoteAddress();
         if (playersInGame.containsKey(playerAddress)) {
             System.err.println("Player already in game: " + playerAddress.toString());
@@ -44,8 +44,8 @@ public class ChessServerHandler extends SimpleChannelInboundHandler<Messages.MCl
         playersInGame.put(playerAddress, gameId);
     }
 
-    protected void handleMoveMessage(ChannelHandlerContext ctx,
-                                     Messages.MClientMessage.MMove msg) throws Exception {
+    protected void handleMessage(ChannelHandlerContext ctx,
+                                 MClientMessage.MMove msg) throws Exception {
         SocketAddress playerAddress = ctx.channel().remoteAddress();
         if (!playersInGame.containsKey(playerAddress)) {
             System.err.println("Player is not in game: " + playerAddress.toString());
@@ -65,7 +65,7 @@ public class ChessServerHandler extends SimpleChannelInboundHandler<Messages.MCl
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx,
-                                Messages.MClientMessage msg) throws Exception {
+                                MClientMessage msg) throws Exception {
         System.err.println(msg.getType().toString());
         switch (msg.getType()) {
             case START_GAME:
@@ -73,14 +73,14 @@ public class ChessServerHandler extends SimpleChannelInboundHandler<Messages.MCl
                     System.err.println("Malformed message: " + msg.toString());
                     return;
                 }
-                handleStartGameMessage(ctx, msg.getStartGame());
+                handleMessage(ctx, msg.getStartGame());
                 break;
             case MOVE:
                 if (!msg.hasMove()) {
                     System.err.println("Malformed message: " + msg.toString());
                     return;
                 }
-                handleMoveMessage(ctx, msg.getMove());
+                handleMessage(ctx, msg.getMove());
                 break;
         }
     }
