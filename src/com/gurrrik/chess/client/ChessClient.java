@@ -1,6 +1,7 @@
 package com.gurrrik.chess.client;
 
 import chesspresso.Chess;
+import com.gurrrik.chess.protos.Messages.EGameType;
 import com.gurrrik.chess.protos.Messages.MClientMessage;
 import com.gurrrik.chess.protos.Messages.MServerMessage;
 
@@ -23,8 +24,7 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -46,10 +46,16 @@ public class ChessClient {
 
     private Channel channel;
 
-    private final Pattern startGamePattern = Pattern.compile("^start\\s+(\\d+)$", Pattern.CASE_INSENSITIVE);
+    private final Pattern startGamePattern = Pattern.compile("^start\\s+(\\d+)\\s+(\\w+)?$", Pattern.CASE_INSENSITIVE);
     private final Pattern movePattern = Pattern.compile("^move\\s+((?:\\w\\d){2})(?:\\s+(\\d+))?$", Pattern.CASE_INSENSITIVE);
 
+    private final Map<String, EGameType> gameTypeNames = new HashMap<>();
+    private final EGameType defaultGameType = EGameType.CHESS;
+
     public ChessClient() {
+        gameTypeNames.put("chess", EGameType.CHESS);
+        gameTypeNames.put("kriegspiel", EGameType.KRIEGSPIEL);
+
         moveTextInput.addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
@@ -78,8 +84,10 @@ public class ChessClient {
         Matcher startGameMatch = startGamePattern.matcher(command);
         if (startGameMatch.matches()) {
             long gameId;
+            String gameType;
             try {
                 gameId = Integer.parseInt(startGameMatch.group(1));
+                gameType = startGameMatch.group(2);
             } catch (NumberFormatException e) {
                 System.err.println(e.toString());
                 return;
@@ -87,7 +95,7 @@ public class ChessClient {
 
             System.err.println("Starting game " + gameId);
 
-            handleStartInput(gameId);
+            handleStartInput(gameId, gameType);
 
             return;
         }
@@ -120,10 +128,14 @@ public class ChessClient {
         System.err.println("Unrecognized command");
     }
 
-    private void handleStartInput(long gameId) throws Exception {
+    private void handleStartInput(long gameId, String gameType) throws Exception {
         MClientMessage.MStartGame.Builder msgStartGameBuilder =
                 MClientMessage.MStartGame.newBuilder();
         msgStartGameBuilder.setGameId(gameId);
+        if (gameType != null || gameTypeNames.containsKey(gameType))
+            msgStartGameBuilder.setGameType(gameTypeNames.get(gameType));
+        else
+            msgStartGameBuilder.setGameType(defaultGameType);
 
         MClientMessage.Builder msgBuilder = MClientMessage.newBuilder();
         msgBuilder.setType(MClientMessage.EType.START_GAME);

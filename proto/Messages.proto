@@ -1,5 +1,10 @@
 package com.gurrrik.chess.protos;
 
+enum EGameType {
+    CHESS = 0;
+    KRIEGSPIEL = 1;
+}
+
 message MClientMessage {
     enum EType {
         START_GAME = 0;
@@ -8,6 +13,7 @@ message MClientMessage {
 
     message MStartGame {
         required int64 gameId = 1;
+        required EGameType gameType = 2;
     }
 
     message MMove {
@@ -37,6 +43,7 @@ message MServerMessage {
 
         required int64 gameId = 1;
         required ESide side = 2;
+        required EGameType gameType = 3;
     }
 
     message MMoveResp {

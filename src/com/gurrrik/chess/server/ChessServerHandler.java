@@ -1,5 +1,6 @@
 package com.gurrrik.chess.server;
 
+import com.gurrrik.chess.protos.Messages.EGameType;
 import com.gurrrik.chess.protos.Messages.MClientMessage;
 
 import io.netty.channel.ChannelHandler;
@@ -24,6 +25,7 @@ public class ChessServerHandler extends SimpleChannelInboundHandler<MClientMessa
         }
 
         long gameId = msg.getGameId();
+        EGameType gameType = msg.getGameType();
         if (games.containsKey(gameId)) {
             ChessGameRoom gameRoom = games.get(gameId);
             if (!gameRoom.hasRoom()) {
@@ -34,7 +36,7 @@ public class ChessServerHandler extends SimpleChannelInboundHandler<MClientMessa
                 System.err.println("Added player " + playerAddress.toString() + " to game room " + gameId);
             }
         } else {
-            ChessGameRoom gameRoom = new ChessGameRoom(gameId);
+            ChessGameRoom gameRoom = new ChessGameRoom(gameId, gameType);
             games.put(gameId, gameRoom);
             System.err.println("Created new game room for " + gameId);
             gameRoom.setNewPlayer(playerAddress, ctx.channel());

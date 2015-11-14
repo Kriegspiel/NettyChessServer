@@ -27,6 +27,7 @@ public class ChessClientHandler extends SimpleChannelInboundHandler<MServerMessa
                                  MServerMessage.MGameStarted msg) {
         System.err.println(msg.getGameId());
         System.err.println(msg.getSide().toString());
+        System.err.println(msg.getGameType().toString());
     }
 
     protected void handleMessage(ChannelHandlerContext ctx,

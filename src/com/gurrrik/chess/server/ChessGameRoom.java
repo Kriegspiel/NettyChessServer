@@ -4,13 +4,15 @@ import chesspresso.Chess;
 import chesspresso.game.Game;
 import chesspresso.move.IllegalMoveException;
 import chesspresso.position.Position;
-import com.gurrrik.chess.protos.Messages;
+import com.gurrrik.chess.protos.Messages.EGameType;
+import com.gurrrik.chess.protos.Messages.MServerMessage;
 import io.netty.channel.Channel;
 
 import java.net.SocketAddress;
 
 public class ChessGameRoom {
     private long gameId;
+    private EGameType gameType;
     private Game chessGame;
     private boolean finished;
 
@@ -27,63 +29,65 @@ public class ChessGameRoom {
     private SocketAddress playerBlack;
     private Channel playerBlackChannel;
 
-    public ChessGameRoom(long id) {
+    public ChessGameRoom(long id, EGameType type) {
         gameId = id;
+        gameType = type;
         chessGame = new Game();
         finished = false;
     }
 
     private void sendGameStarted() {
-        Messages.MServerMessage.MGameStarted.Builder msgGameStartedBuilder
-                = Messages.MServerMessage.MGameStarted.newBuilder();
+        MServerMessage.MGameStarted.Builder msgGameStartedBuilder
+                = MServerMessage.MGameStarted.newBuilder();
         msgGameStartedBuilder.setGameId(gameId);
-        msgGameStartedBuilder.setSide(Messages.MServerMessage.MGameStarted.ESide.WHITE);
+        msgGameStartedBuilder.setSide(MServerMessage.MGameStarted.ESide.WHITE);
+        msgGameStartedBuilder.setGameType(gameType);
 
-        Messages.MServerMessage.Builder msgBuilder
-                = Messages.MServerMessage.newBuilder();
-        msgBuilder.setType(Messages.MServerMessage.EType.GAME_STARTED);
+        MServerMessage.Builder msgBuilder
+                = MServerMessage.newBuilder();
+        msgBuilder.setType(MServerMessage.EType.GAME_STARTED);
         msgBuilder.setGameStarted(msgGameStartedBuilder.build());
 
-        Messages.MServerMessage msgWhite = msgBuilder.build();
+        MServerMessage msgWhite = msgBuilder.build();
 
-        msgGameStartedBuilder.setSide(Messages.MServerMessage.MGameStarted.ESide.BLACK);
+        msgGameStartedBuilder.setSide(MServerMessage.MGameStarted.ESide.BLACK);
         msgBuilder.setGameStarted(msgGameStartedBuilder.build());
 
-        Messages.MServerMessage msgBlack = msgBuilder.build();
+        MServerMessage msgBlack = msgBuilder.build();
 
         playerWhiteChannel.writeAndFlush(msgWhite);
         playerBlackChannel.writeAndFlush(msgBlack);
     }
 
     private void sendGameState() {
-        Messages.MServerMessage.MStateUpdate.Builder msgStateUpdateBuilder
-                = Messages.MServerMessage.MStateUpdate.newBuilder();
+        MServerMessage.MStateUpdate.Builder msgStateUpdateBuilder
+                = MServerMessage.MStateUpdate.newBuilder();
         msgStateUpdateBuilder.setNewState(chessGame.getPosition().toString());
 
-        Messages.MServerMessage.Builder msgBuilder
-                = Messages.MServerMessage.newBuilder();
-        msgBuilder.setType(Messages.MServerMessage.EType.STATE_UPDATE);
+        MServerMessage.Builder msgBuilder
+                = MServerMessage.newBuilder();
+        msgBuilder.setType(MServerMessage.EType.STATE_UPDATE);
         msgBuilder.setStateUpdate(msgStateUpdateBuilder.build());
 
-        Messages.MServerMessage msg = msgBuilder.build();
+        MServerMessage msg = msgBuilder.build();
 
         playerWhiteChannel.writeAndFlush(msg);
         playerBlackChannel.writeAndFlush(msg);
     }
 
     private void sendMoveResponse(int player, boolean response) {
-        Messages.MServerMessage.MMoveResp.Builder msgMoveRespBuilder
-                = Messages.MServerMessage.MMoveResp.newBuilder();
+        MServerMessage.MMoveResp.Builder msgMoveRespBuilder
+                = MServerMessage.MMoveResp.newBuilder();
         msgMoveRespBuilder.setResponse(response
-                ? Messages.MServerMessage.MMoveResp.EResponse.SUCCESS
-                : Messages.MServerMessage.MMoveResp.EResponse.FAILURE);
+                ? MServerMessage.MMoveResp.EResponse.SUCCESS
+                : MServerMessage.MMoveResp.EResponse.FAILURE);
 
-        Messages.MServerMessage.Builder msgBuilder
-                = Messages.MServerMessage.newBuilder();
-        msgBuilder.setType(Messages.MServerMessage.EType.MOVE_RESP);
+        MServerMessage.Builder msgBuilder
+                = MServerMessage.newBuilder();
+        msgBuilder.setType(MServerMessage.EType.MOVE_RESP);
         msgBuilder.setMoveResp(msgMoveRespBuilder.build());
 
-        Messages.MServerMessage msg = msgBuilder.build();
+        MServerMessage msg = msgBuilder.build();
 
         switch (player) {
             case Chess.WHITE:
@@ -98,28 +102,28 @@ public class ChessGameRoom {
     }
 
     private void sendGameOver(int result) {
-        Messages.MServerMessage.MGameOver.Builder msgGameOverBuilder
-                = Messages.MServerMessage.MGameOver.newBuilder();
+        MServerMessage.MGameOver.Builder msgGameOverBuilder
+                = MServerMessage.MGameOver.newBuilder();
         switch (result) {
             case Chess.RES_WHITE_WINS:
-                msgGameOverBuilder.setResult(Messages.MServerMessage.MGameOver.EResult.WHITE);
+                msgGameOverBuilder.setResult(MServerMessage.MGameOver.EResult.WHITE);
                 break;
             case Chess.RES_BLACK_WINS:
-                msgGameOverBuilder.setResult(Messages.MServerMessage.MGameOver.EResult.BLACK);
+                msgGameOverBuilder.setResult(MServerMessage.MGameOver.EResult.BLACK);
                 break;
             case Chess.RES_DRAW:
-                msgGameOverBuilder.setResult(Messages.MServerMessage.MGameOver.EResult.DRAW);
+                msgGameOverBuilder.setResult(MServerMessage.MGameOver.EResult.DRAW);
                 break;
             default:
                 return;
         }
 
-        Messages.MServerMessage.Builder msgBuilder
-                = Messages.MServerMessage.newBuilder();
-        msgBuilder.setType(Messages.MServerMessage.EType.GAME_OVER);
+        MServerMessage.Builder msgBuilder
+                = MServerMessage.newBuilder();
+        msgBuilder.setType(MServerMessage.EType.GAME_OVER);
         msgBuilder.setGameOver(msgGameOverBuilder.build());
 
-        Messages.MServerMessage msg = msgBuilder.build();
+        MServerMessage msg = msgBuilder.build();
 
         if (playerWhiteChannel != null)
             playerWhiteChannel.writeAndFlush(msg);
