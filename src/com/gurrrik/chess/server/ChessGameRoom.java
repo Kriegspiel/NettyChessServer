@@ -10,6 +10,46 @@ import io.netty.channel.Channel;
 
 import java.net.SocketAddress;
 
+class KriegspielBoardFilter {
+    static String filter(String position, int player) {
+        String[] pieces = position.split("\\s+");
+
+        String filtered = "";
+        switch (player) {
+            case Chess.WHITE:
+                filtered = pieces[0].replaceAll("[a-z]", "1");
+                break;
+            case Chess.BLACK:
+                filtered = pieces[0].replaceAll("[A-Z]", "1");
+                break;
+            default:
+                break;
+        }
+
+        StringBuilder sb = new StringBuilder();
+        int num = 0;
+        boolean onNum = false;
+        for (char c: filtered.toCharArray()) {
+            if (Character.isDigit(c)) {
+                onNum = true;
+                num += c - '0';
+            } else {
+                if (onNum) {
+                    onNum = false;
+                    sb.append(num);
+                    num = 0;
+                }
+                sb.append(c);
+            }
+        }
+        if (onNum)
+            sb.append(num);
+
+        pieces[0] = sb.toString();
+        return String.join(" ", pieces);
+    }
+}
+
 public class ChessGameRoom {
     private long gameId;
     private EGameType gameType;
@@ -60,6 +100,19 @@ public class ChessGameRoom {
     }
 
     private void sendGameState() {
+        switch (gameType) {
+            case CHESS:
+                sendGameStateChess();
+                break;
+            case KRIEGSPIEL:
+                sendGameStateKriegspiel();
+                break;
+            default:
+                break;
+        }
+    }
+
+    private void sendGameStateChess() {
         MServerMessage.MStateUpdate.Builder msgStateUpdateBuilder
                 = MServerMessage.MStateUpdate.newBuilder();
         msgStateUpdateBuilder.setNewState(chessGame.getPosition().toString());
@@ -73,6 +126,25 @@ public class ChessGameRoom {
 
         playerWhiteChannel.writeAndFlush(msg);
         playerBlackChannel.writeAndFlush(msg);
+    }
+
+    private void sendGameStateKriegspiel() {
+        MServerMessage.MStateUpdate.Builder msgStateUpdateBuilder
+                = MServerMessage.MStateUpdate.newBuilder();
+
+        MServerMessage.Builder msgBuilder
+                = MServerMessage.newBuilder();
+        msgBuilder.setType(MServerMessage.EType.STATE_UPDATE);
+
+        msgStateUpdateBuilder.setNewState(
+                KriegspielBoardFilter.filter(chessGame.getPosition().toString(), Chess.WHITE));
+        msgBuilder.setStateUpdate(msgStateUpdateBuilder.build());
+        playerWhiteChannel.writeAndFlush(msgBuilder.build());
+
+        msgStateUpdateBuilder.setNewState(
+                KriegspielBoardFilter.filter(chessGame.getPosition().toString(), Chess.BLACK));
+        msgBuilder.setStateUpdate(msgStateUpdateBuilder.build());
+        playerBlackChannel.writeAndFlush(msgBuilder.build());
     }
 
     private void sendMoveResponse(int player, boolean response) {
