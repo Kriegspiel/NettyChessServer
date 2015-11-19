@@ -9,24 +9,39 @@ import com.gurrrik.chess.protos.Messages.MServerMessage;
 import io.netty.channel.Channel;
 
 import java.net.SocketAddress;
+import java.util.Arrays;
 
 class KriegspielBoardFilter {
     static String filter(String position, int player) {
-        String[] pieces = position.split("\\s+");
+        String[] stringPieces = position.split("\\s+");
 
-        String filtered = "";
-        switch (player) {
-            case Chess.WHITE:
-                filtered = pieces[0].replaceAll("[a-z]", "1");
-                break;
-            case Chess.BLACK:
-                filtered = pieces[0].replaceAll("[A-Z]", "1");
-                break;
-            default:
-                break;
+        StringBuilder boardBuilder = new StringBuilder();
+        StringBuilder opponentPiecesBuilder = new StringBuilder();
+        for (char c: stringPieces[0].toCharArray()) {
+            switch (player) {
+                case Chess.WHITE:
+                    if (Character.isLowerCase(c)) {
+                        boardBuilder.append('1');
+                        opponentPiecesBuilder.append(c);
+                    } else {
+                        boardBuilder.append(c);
+                    }
+                    break;
+                case Chess.BLACK:
+                    if (Character.isUpperCase(c)) {
+                        boardBuilder.append('1');
+                        opponentPiecesBuilder.append(c);
+                    } else {
+                        boardBuilder.append(c);
+                    }
+                    break;
+                default:
+                    break;
+            }
         }
+        String filtered = boardBuilder.toString();
 
-        StringBuilder sb = new StringBuilder();
+        boardBuilder = new StringBuilder();
         int num = 0;
         boolean onNum = false;
         for (char c: filtered.toCharArray()) {
@@ -36,17 +51,21 @@ class KriegspielBoardFilter {
             } else {
                 if (onNum) {
                     onNum = false;
-                    sb.append(num);
+                    boardBuilder.append(num);
                     num = 0;
                 }
-                sb.append(c);
+                boardBuilder.append(c);
             }
         }
         if (onNum)
-            sb.append(num);
+            boardBuilder.append(num);
 
-        pieces[0] = sb.toString();
-        return String.join(" ", pieces);
+        char[] pieces = opponentPiecesBuilder.toString().toCharArray();
+        Arrays.sort(pieces);
+        String sortedOpponentPieces = new String(pieces);
+
+        stringPieces[0] = boardBuilder.toString() + " " + sortedOpponentPieces;
+        return String.join(" ", stringPieces);
     }
 }
 
