@@ -40,10 +40,6 @@ class CLArgs {
 }
 
 public class ChessClient {
-    private JTextArea chessBoardText;
-    private JTextField moveTextInput;
-    private JLabel sideLabel;
-
     private Channel channel;
 
     private final Pattern startGamePattern = Pattern.compile("^start\\s+(\\d+)(?:\\s+(\\w+))?$", Pattern.CASE_INSENSITIVE);
@@ -55,23 +51,6 @@ public class ChessClient {
     public ChessClient() {
         gameTypeNames.put("chess", EGameType.CHESS);
         gameTypeNames.put("kriegspiel", EGameType.KRIEGSPIEL);
-
-        moveTextInput.addKeyListener(new KeyAdapter() {
-            @Override
-            public void keyPressed(KeyEvent e) {
-                if (e.getKeyCode() == 13) {
-                    String command = moveTextInput.getText();
-                    moveTextInput.setText("");
-                    try {
-                        handleStringCommand(command);
-                    } catch (Exception exc) {
-                        System.err.println(exc.getMessage());
-                    }
-                } else {
-                    super.keyPressed(e);
-                }
-            }
-        });
     }
 
     private void handleInput() throws Exception {
