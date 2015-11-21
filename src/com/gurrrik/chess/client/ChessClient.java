@@ -43,7 +43,7 @@ public class ChessClient {
     private Channel channel;
 
     private final Pattern startGamePattern = Pattern.compile("^start\\s+(\\d+)(?:\\s+(\\w+))?$", Pattern.CASE_INSENSITIVE);
-    private final Pattern movePattern = Pattern.compile("^move\\s+((?:\\w\\d){2})(?:\\s+(\\d+))?$", Pattern.CASE_INSENSITIVE);
+    private final Pattern movePattern = Pattern.compile("^move\\s+((?:\\w\\d){2})(?:\\s+(\\w))?$", Pattern.CASE_INSENSITIVE);
 
     private final Map<String, EGameType> gameTypeNames = new HashMap<>();
     private final EGameType defaultGameType = EGameType.CHESS;
@@ -91,9 +91,9 @@ public class ChessClient {
 
             try {
                 if (moveMatch.group(2) == null)
-                    promoPiece = 0;
+                    promoPiece = Chess.NO_PIECE;
                 else
-                    promoPiece = Integer.parseInt(moveMatch.group(2));
+                    promoPiece = Chess.charToPiece(moveMatch.group(2).charAt(0));
             } catch (NumberFormatException e) {
                 System.err.println(e.toString());
                 return;

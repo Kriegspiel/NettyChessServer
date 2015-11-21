@@ -244,8 +244,8 @@ public class ChessGameRoom {
         if (finished)
             return;
 
-        if (promoPiece < 0)
-            promoPiece = 0;
+        if (promoPiece < Chess.MIN_PIECE || promoPiece > Chess.MAX_PIECE)
+            promoPiece = Chess.NO_PIECE;
 
         Position pos = chessGame.getPosition();
         if (playerAddress.equals(playerWhite)) {
