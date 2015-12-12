@@ -2,7 +2,7 @@
   <configuration default="false" name="ChessServer" type="Application" factoryName="Application" nameIsGenerated="true">
     <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea">
       <pattern>
-        <option name="PATTERN" value="com.gurrrik.chess.server.*" />
+        <option name="PATTERN" value="com.gurrrik.chess.*" />
         <option name="ENABLED" value="true" />
       </pattern>
     </extension>
